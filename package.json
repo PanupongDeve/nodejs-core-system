@@ -1,0 +1,25 @@
+{
+  "name": "nodejs-core-system",
+  "version": "1.0.0",
+  "description": "template nodejs for build api",
+  "main": "index.js",
+  "repository": "https://github.com/PanupongDeve/nodejs-core-system.git",
+  "author": "PanupongDeve",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.3",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "sequelize": "^5.21.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "dev": "nodemon index.js"
+  }
+}
