@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const environments = {
-    PORT_APP: process.env.PORT_APP || 3000
+    SALT_ROUNDS: Number(process.env.SALT_ROUNDS) || 10
 }
 
 module.exports = environments;

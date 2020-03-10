@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const environments = {
-    PORT_APP: process.env.PORT_APP || 3000
+    JWT_SECRET: process.env.JWT_SECRET || 'primo-world'
 }
 
 module.exports = environments;
