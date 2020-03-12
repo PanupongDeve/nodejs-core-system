@@ -1,5 +1,6 @@
 const hashHelpers = require('../../helpers/hash-helpers');
 const jwtHelpers = require('../../helpers/jwt-helpers');
+const user = require('../../datasoruce/mysql/mariadb/model/user');
 
 class UserRepository {
     constructor() {
@@ -77,6 +78,11 @@ class UserRepository {
             this.handleError(error);
             
         }
+    }
+
+    async getUsers() {
+        const users = await user.findAll();
+        return users;
     }
 }
 

@@ -1,8 +1,9 @@
-
+const userRepository = require('../../repository/userRepository');
 class HomeController {
     
     async get(req, res) {
-        res.send('hello');
+        const users = await userRepository.getUsers();
+        res.send(users);
     }
 }
 
