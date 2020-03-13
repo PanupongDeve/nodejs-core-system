@@ -2,7 +2,6 @@ const userRepository = require('../userRepository');
 
 const test = async () => {
     const responseData = await userRepository.signUp('panupongdeve', '123456');
-    console.log('responseData', responseData);
 
     await userRepository.setPasswordHash(responseData.profile.passwordHash);
     await userRepository.setIsTester(true);

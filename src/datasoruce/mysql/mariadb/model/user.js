@@ -10,8 +10,17 @@ User.init({
     allowNull: false
   },
   lastName: {
-    type: Sequelize.STRING
-    // allowNull defaults to true
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  username: {
+    type: Sequelize.STRING,
+    unique: true,
+    allowNull: false
+  },
+  passwordHash: {
+    type: Sequelize.STRING,
+    allowNull: false
   }
 }, {
   sequelize,

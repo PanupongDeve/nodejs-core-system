@@ -1,6 +1,8 @@
 const hashHelpers = require('../../helpers/hash-helpers');
 const jwtHelpers = require('../../helpers/jwt-helpers');
-const user = require('../../datasoruce/mysql/mariadb/model/user');
+const userModel = require('../../datasoruce/mysql/mariadb/model/user');
+const { ERROR_TYPE } = require('../../constant/errorType');
+const { dbExceptionErrorHelpers } = require('../../helpers/db-exception-helpers');
 
 class UserRepository {
     constructor() {
@@ -23,31 +25,41 @@ class UserRepository {
         this.passwordHashed = passwordHashed;
     }
 
-    async signUp(username, password) {
+    async signUp(users) {
         try {
+            const { username, password, firstName, lastName } = users;
             const passwordHash = hashHelpers.hash(password);
             // store to db;
+
+            const usersDBCreated = await userModel.create({ username, passwordHash, firstName, lastName });
+
             const userCreated = {
-                username,
-                passwordHash
+                firstName,
+                lastName,
+                username
             }
 
             const token = jwtHelpers.generate(userCreated);
-            const profile = jwtHelpers.verify(token);
+
             return {
                 token,
-                profile
+                profile: userCreated
             };
 
 
         } catch (error) {
-            this.handleError(error);
+            const exception_error = {
+                errorType: ERROR_TYPE.DB_EXCEPTION,
+                message: dbExceptionErrorHelpers(error.errors)
+            }
+            this.handleError(exception_error);
         }
     }
 
-    async getToken(username, password) {
+    async getToken(users) {
         try {
             let passwordHashed = '';
+            const { username, password } = users;
             // check username and recive passwordHash from db
 
             // use custom passwordHash for test;
@@ -55,33 +67,56 @@ class UserRepository {
                 passwordHashed = this.passwordHashed
             }
 
+            const user = await userModel.findOne({ where: { username } });
+            if (user === null) {
+                throw {
+                    humanDetect: true,
+                    message: "username and password incorrect!"
+                 }
+            }
+
+            passwordHashed = user.passwordHash;
+            
+
             if (!hashHelpers.compareHash(password, passwordHashed)) {
                 throw {
-                    message: "username and password incorrect!"
+                   humanDetect: true,
+                   message: "username and password incorrect!"
                 }
             }
 
             const userCreated = {
-                username,
-                passwordHashed: passwordHashed
+                firstName: user.firstName,
+                lastName: user.lastName,
+                username: user.username
             }
 
             const token = jwtHelpers.generate(userCreated);
-            const profile = jwtHelpers.verify(token);
             return {
                 token,
-                profile
+                profile: userCreated
             };
 
         } catch (error) {
-            console.log(error.message);
-            this.handleError(error);
+            let exception_error = null;
+            if (error.humanDetect) {
+                exception_error = {
+                    errorType: ERROR_TYPE.VALIDATE_EXCEPTION,
+                    message: error.message
+                }
+            } else {
+                exception_error = {
+                    errorType: ERROR_TYPE.DB_EXCEPTION,
+                    message: dbExceptionErrorHelpers(error.errors)
+                }
+            }
+            this.handleError(exception_error);
             
         }
     }
 
     async getUsers() {
-        const users = await user.findAll();
+        const users = await userModel.findAll();
         return users;
     }
 }
