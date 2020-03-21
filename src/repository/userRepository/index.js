@@ -1,5 +1,6 @@
 const hashHelpers = require('../../helpers/hash-helpers');
 const jwtHelpers = require('../../helpers/jwt-helpers');
+const utilsHelpers = require('../../helpers/utils-helpers');
 const userModel = require('../../datasoruce/mysql/mariadb/model/user');
 const { ERROR_TYPE } = require('../../constant/errorType');
 const { dbExceptionErrorHelpers } = require('../../helpers/db-exception-helpers');
@@ -72,16 +73,16 @@ class UserRepository {
                 throw {
                     humanDetect: true,
                     message: "username and password incorrect!"
-                 }
+                }
             }
 
             passwordHashed = user.passwordHash;
-            
+
 
             if (!hashHelpers.compareHash(password, passwordHashed)) {
                 throw {
-                   humanDetect: true,
-                   message: "username and password incorrect!"
+                    humanDetect: true,
+                    message: "username and password incorrect!"
                 }
             }
 
@@ -111,13 +112,27 @@ class UserRepository {
                 }
             }
             this.handleError(exception_error);
-            
+
         }
     }
 
     async getUsers() {
         const users = await userModel.findAll();
-        return users;
+        return this.getUsersDTO(users);
+    }
+
+    getUsersDTO(users) {
+        const usersDTO = users.map(user => {
+            return {
+                "id": utilsHelpers.getDataWithNull(user.id),
+                "firstName": utilsHelpers.getDataWithNull(user.firstName),
+                "lastName": utilsHelpers.getDataWithNull(user.lastName),
+                "username": utilsHelpers.getDataWithNull(user.username),
+                "createdAt": utilsHelpers.getDataWithNull(user.createdAt),
+                "updatedAt": utilsHelpers.getDataWithNull(user.updatedAt)
+            }
+        });
+        return usersDTO
     }
 }
 
